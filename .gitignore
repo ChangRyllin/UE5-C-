@@ -1,0 +1,26 @@
+# Ignore everything in the `.vs` folder
+.vs/
+
+# Ignore Unreal Engine binary files and intermediate folders
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Ignore large IPCH files
+.vs/*.ipch
+
+# Ignore local configuration files
+.vscode/
+.idea/
+
+# Ignore user-specific files
+*.user
+*.userprefs
+
+
+*.pch
+*.obj
+*.log
+*.exe
+*.dll
