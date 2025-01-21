@@ -8,6 +8,9 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+
 
 UCLASS()
 class MYPROJECT_API APCharacter : public ACharacter
@@ -31,8 +34,22 @@ public:
 
 
 private:
+
+	//camera
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent>CameraBoom;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent>PlayerCamera;
+
+
+	//input
+	UPROPERTY(EditDefaultsOnly, Category = "input")
+	TObjectPtr<UInputComponent>DefaultMapping;
+
+	UPROPERTY(EditDefaultsOnly, Category = "input")
+	TObjectPtr<UInputAction>MoveAction;
+	UPROPERTY(EditDefaultsOnly, Category = "input")
+	TObjectPtr<UInputAction>LookAction;
+
 
 };
