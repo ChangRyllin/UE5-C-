@@ -4,7 +4,8 @@
 #include "PCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFrameWork/SpringArmComponent.h"
-
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 APCharacter::APCharacter()
@@ -29,8 +30,43 @@ APCharacter::APCharacter()
 void APCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (const ULocalPlayer* Player = (GEngine && GetWorld()) ? GEngine->GetFirstGamePlayer(GetWorld()) : nullptr)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Player);
+		if (DefaultMapping)
+		{
+			Subsystem->AddMappingContext(DefaultMapping, 0);
+		}
+
+	}
 	
 }
+
+void APCharacter::Move(const FInputActionValue& value)
+{
+	FVector2D MoveVector = value.Get<FVector2D>();
+	if (Controller)
+	{
+		const FRotator ControllerRotationOnlyY (0, Controller->GetControlRotation().Yaw, 0);
+		const FVector FowardDirection(FRotationMatrix(ControllerRotationOnlyY).GetUnitAxis(EAxis::X));
+		const FVector RinghtDirection(FRotationMatrix(ControllerRotationOnlyY).GetUnitAxis(EAxis::Y));
+		AddMovementInput(FowardDirection, MoveVector.X);
+		AddMovementInput(RinghtDirection, MoveVector.Y);
+
+	}
+}
+
+void APCharacter::Look(const FInputActionValue& value)
+{
+	FVector2D LookInput = value.Get<FVector2D>();
+	if (Controller)
+	{
+		AddControllerYawInput(LookInput.X);
+		AddControllerPitchInput(LookInput.Y);
+	}
+}
+
 
 // Called every frame
 void APCharacter::Tick(float DeltaTime)
@@ -43,6 +79,11 @@ void APCharacter::Tick(float DeltaTime)
 void APCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &APCharacter::Look);
+		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APCharacter::Move);
+	}
 
 }
 
