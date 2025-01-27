@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
 
 #include "PCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFrameWork/SpringArmComponent.h"
+
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFrameWork/CharacterMovementComponent.h"
 
 // Sets default values
 APCharacter::APCharacter()
@@ -23,6 +26,22 @@ APCharacter::APCharacter()
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>("Player Camera");
 	PlayerCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
+
+	//prevent character rotation from rotating with controller
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+
+	//prevent camera from rotating with controller
+	PlayerCamera->bUsePawnControlRotation = false;
+
+	//allow cameraBoom rotation with controller
+	CameraBoom->bUsePawnControlRotation = true;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
+	
 
 }
 
@@ -57,9 +76,9 @@ void APCharacter::Move(const FInputActionValue& value)
 	}
 }
 
-void APCharacter::Look(const FInputActionValue& value)
+void APCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D LookInput = value.Get<FVector2D>();
+	FVector2D LookInput = Value.Get<FVector2D>();
 	if (Controller)
 	{
 		AddControllerYawInput(LookInput.X);
